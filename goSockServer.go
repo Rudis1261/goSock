@@ -1,8 +1,9 @@
 package main
+
 import (
 	"log"
 	"net"
-//	"os"
+	//	"os"
 )
 
 func main() {
@@ -11,9 +12,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Printf("Server Listening on %s", ln.Addr())
+
 	msgchan := make(chan string)
 	go printMessages(msgchan)
-	
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -26,14 +29,14 @@ func main() {
 
 func handleConnection(c net.Conn, msgchan chan<- string) {
 	buf := make([]byte, 4096)
-
+	log.Printf("New connection from %s", c.RemoteAddr())
 	for {
 		n, err := c.Read(buf)
 		if err != nil || n == 0 {
 			c.Close()
 			break
 		}
-	
+
 		msgchan <- string(buf[0:n])
 		n, err = c.Write(buf[0:n])
 		if err != nil {
